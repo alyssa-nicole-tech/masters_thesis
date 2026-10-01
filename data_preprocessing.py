@@ -4,37 +4,70 @@
   #youtube_transcript_api
 
 #ETL Extractor Routine
-
 import os
 from yt_dlp import YoutubeDL
-from youtube_transcript_apu import YoutTubeTranscriptApi
+from youtube_transcript_api import YouTubeTranscriptApi
 
-def extract_youtube(url, output_dir="data/raw"): 
-  """
-  Extract metadata, audio, and transcrip from a YouTube video.
-  Returns a dictionary containing all extracted componednts
-  """
-  os.makedirs(output_dir, exist_ok=True)
+def extract_youtube(url, output_dir="data/raw"):
+    """
+    Extract metadata, audio, and transcript from a YouTube video.
+    Returns a dictionary containing all extracted components.
+    """
+    os.makedirs(output_dir, exist_ok=True)
 
-#--- 1. Extract metadata + audio ---
+    # --- 1. Extract metadata + audio ---
+    ydl_opts = {
+        "quiet": True,
+        "format": "bestaudio/best",
+        "outtmpl": f"{output_dir}/%(id)s.%(ext)s"
+    }
 
-ydl_opts {
-  "quiet": True, 
-  "format": "bestaudio/best",
-  "outtmpl": f'{output_dir}/%(id)s.%(ext)s"
-}
+    with YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=True)
 
-with YoutubeDL(ydl_opts) as ydl:
-  infor = ydl.ectract_info(url, download=True)
+    video_id = info["https://youtu.be/QeJAdlV4fXM?si=cmAfZBnOtW0da_Y3"]
+    audio_path = f"{output_dir}/{video_id}.webm"
 
-video_id = 
+    # --- 2. Extract transcript ---
+    try:
+        transcript = YouTubeTranscriptApi.get_transcript(video_id)
+    except Exception:
+        transcript = None
+
+    return {
+        "video_id": video_id,
+        "title": info.get("title"),
+        "description": info.get("description"),
+        "audio_path": audio_path,
+        "transcript": transcript,
+        "metadata": info
+    }
+
+def load_extracted(etl_output):
+    """
+    Load ETL output into a usable form for preprocessing.
+    """
+    print(f"Loaded YouTube extraction for video: {etl_output['title']}")
+    print(f"Transcript segments: {len(etl_output['transcript']) if etl_output['transcript'] else 0}")
+    print(f"Audio file: {etl_output['audio_path']}")
+
+    return etl_output
+
+from etl_youtube import extract_youtube
+from data_preprocessing import load_extracted
+
+etl_output = extract_youtube("https://youtu.be/QeJAdlV4fXM?si=SIMpO4nAhUGetyRf")
+data = load_extracted(etl_output)
+
+def load_extracted(etl_output):
+    """
+    Load ETL output into a usable form for preprocessing.
+    """
+    print(f"Loaded YouTube extraction for video: {etl_output['title']}")
+    print(f"Transcript segments: {len(etl_output['transcript']) if etl_output['transcript'] else 0}")
+    print(f"Audio file: {etl_output['audio_path']}")
+
+    return etl_output
 
 
-def load_data(path):
-  df = pd.read_csv(path)
-  return df
 
-def clean_text(text):
-  #TODO: add linguistic preprocess
-  return text.lower().strup()
- 
