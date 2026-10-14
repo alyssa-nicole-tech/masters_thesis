@@ -6,11 +6,9 @@ Ambiguity in social-cultural language exchanges often results in a message recei
 # Methodology
 What models are used to analyze the dataset?  
 
-The overall procedure is discourse analysis using dual model representations.
-
 Step 1: N-Grams: Lexical Content Trends 
 
-Step 2: Vectorization: TD - IDF: Word Vectors 
+Step 2: Vectorization: Word-Word Matrix Representation - Long and Sparse Word Vectors
 
 Step 3: Logistic Regression Classifier: Logistic Regression Function--> Softmax--> Cross-Entropy Loss--> Stochastic Gradient Descent--> Model Evaluation--> Scoring of Documents of Lexical Trends
 
